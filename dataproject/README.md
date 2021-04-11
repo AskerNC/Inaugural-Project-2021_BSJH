@@ -2,7 +2,7 @@
 
 Our project is titled **Dataproject** and is about how COVID-19 has affected unemployment.
 
-The **results** of the project can be seen from running [dataproject.ipynb](dataproject.ipynb).
+The **results** of the project can be seen from running https://github.com/NumEconCopenhagen/Inaugural-Project-2021_BSJH/blob/master/dataproject/Data_project.ipynb
 
 Two datasets are used:
 
