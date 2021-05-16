@@ -82,8 +82,6 @@ def h(x, parlist):
     return eq
 
 
-
-
 def calibrate(x, parlist):
     """ The function isolates each scale parameter
     Args:
@@ -107,10 +105,42 @@ def calibrate(x, parlist):
     par.mux22 =  x[13]/((x[3]/x[9])**(-par.EM)*x[7])
     par.gamma1 = x[14]/((x[2]/x[16])**(-par.EC)*x[17]/x[16])
     par.gamma2 = x[15]/((x[3]/x[16])**(-par.EC)*x[17]/x[16])
+
+
+
     print(f'Equation values after calibration: {h(x, par)}')
     return par
 
+
+def calibrate_2(x, parlist, calibration_vars=['muYL1', 'muYL2', 'muYM1', 'muYM2', 'mux11', 'mux12', 'mux21', 'mux22', 'gamma1', 'gamma2'] ):
+    """ The function isolates each scale parameter
+    Args:
+         x: a vector containing endogenous variables
+         parlist: a list with parameters
+         
+    Returns:
+       parameter values that fit the mock data 
+
+    """
+    par=parlist
+    print(f'Equation values before calibration: {h(x, par)}')
+        
+
+    def obj(x_pars):
+        for xi,key in zip(x_pars,calibration_vars):
+            setattr(par, key,xi)
+        return h(x,par)
+
+
+    x0 = [getattr(parlist,key) for key in calibration_vars]
+    res = optimize.root(obj,x0=x0, method='lm')
+
+    for xi,key in zip(res.x,calibration_vars):
+        setattr(par, key,xi)
     
+    print(f'Equation values after calibration: {h(x, par)}')
+    return par
+
     
 def solve_model(x0, EC, EM, EY, theta1, theta2, parlist, theta1m, theta2m):
     """ The function solves the model by solving the model using a root finder
@@ -137,7 +167,7 @@ def solve_model(x0, EC, EM, EY, theta1, theta2, parlist, theta1m, theta2m):
     par.theta2=theta2
     par.theta1m=theta1m
     par.theta2m=theta2m                                
-    result = optimize.root(h,x0, args=(par))
+    result = optimize.root(h,x0, args=(par),method='lm')
     #Check whether solution is found
     if result.success==False:
         raise Exception("Solution not found")
